@@ -59,6 +59,6 @@ ptlist = sorted(ptlist, cmp=lambda x, y: cmp(x[1], y[1]) or cmp(x[0], y[0]))
 for i, pt in enumerate(ptlist, start=1):
     cv2.imwrite(outbasename % i,
             img[pt[1]+1:pt[1]+theight-2, pt[0]+1:pt[0]+twidth-2])
-    #re = cv2.rectangle(img, pt, (pt[0]+1+twidth-2, pt[1]+theight-2), 0, 2)
-    #re = cv2.rectangle(img, pt, (pt[0] + tw, pt[1] + th), 0, 2)
+    re = cv2.rectangle(img, pt, (pt[1]+theight-2, pt[0]+twidth-2), 0, 2)
+    #re = cv2.rectangle(img, pt, (pt[0] + twidth, pt[1] + theight), 0, 2)
     print 'Wrote %s' % (outbasename % i)
