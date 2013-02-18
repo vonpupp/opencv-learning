@@ -2,17 +2,37 @@ import sys
 import cv2
 import numpy
 
-outbasename = 'hexagon_%02d.png'
+outbasename = 'out-multimatch05/hexagon_%02d.png'
 
 img = cv2.imread(sys.argv[1])
-template = cv2.cvtColor(cv2.imread(sys.argv[2]), cv2.COLOR_BGR2GRAY)
+cv2.imshow('input file' + sys.argv[1] + ' [img]', img)
+cv2.waitKey(0)
+
+template = cv2.cvtColor(cv2.imread('search-pattern05-mmgp.png'), cv2.COLOR_BGR2GRAY)
+cv2.imshow('template file search-pattern05-mmgp.png [template]', template)
+cv2.waitKey(0)
+
+original_template = cv2.imread(sys.argv[2])
+cv2.imshow('template file' + sys.argv[2] + ' [template]', original_template)
+cv2.waitKey(0)
+
+otheight, otwidth = template.shape[:2]
+
+# BEGIN LOAD ORIGINAL TEMPLATE
+hsv = cv2.cvtColor(original_template, cv2.COLOR_BGR2HSV)
+saturation = hsv[:,:,1]
+negtpl = hsv[:,:,2]
+negtpl[saturation > 35] = 255
+negtpl = cv2.threshold(negtpl, 0, 255, cv2.THRESH_OTSU)[1]
+# Pad the image.
+negtpl = cv2.copyMakeBorder(255 - negtpl, 3, 3, 3, 3, cv2.BORDER_CONSTANT, value=0)
+template = negtpl
+# END LOAD ORIGINAL TEMPLATE
+
 theight, twidth = template.shape[:2]
-
-cv2.imshow('input file test01.jpeg [img]', img)
+cv2.imshow('[template]', template)
 cv2.waitKey(0)
 
-cv2.imshow('template file search-pattern04.jpeg [template]', template)
-cv2.waitKey(0)
 
 # Binarize the input based on the saturation and value.
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -47,6 +67,7 @@ match = cv2.matchTemplate(img_clean, template, cv2.TM_CCORR_NORMED)
 
 # Filter matches.
 threshold = 0.8
+threshold = 0.63
 dist_threshold = twidth / 1.5
 loc = numpy.where(match > threshold)
 ptlist = numpy.zeros((len(loc[0]), 2), dtype=int)
